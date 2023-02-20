@@ -1,0 +1,5 @@
+bazel-*
+*.swp
+venv
+__pycache__/
+dist/
