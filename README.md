@@ -33,23 +33,25 @@ from solid_oidc_client import SolidOidcClient, SolidAuthSession, MemStore
 
 # create a client instance
 solid_oidc_client = SolidOidcClient(storage=MemStore())
-OAUTH_CALLBACK_URI = '/oauth/callback'
+
+# after the login, the user will be redirected to this URI from your application
+OAUTH_CALLBACK_URI = 'https://my.example.app/oauth/callback'
 
 # register this application with the issuer (client_id and client_secret are currently only stored in memory, regardless of the previous storage)
-# the redirect url in this case is /oauth/callback
 solid_oidc_client.register_client('https://login.inrupt.com/', [OAUTH_CALLBACK_URI])
 
-# initiate a login by redirecting the user to this url
-# store the path you want to redirect the user after the login ('/')
+# initiate a login by creating and redirecting the user to the login_url
+# the first parameter is stored, and later returned by get_application_redirect_uri. It helps to remember which page the user wanted to visit before the login
+# the second parameter tells the identity provider, where it should redirect the user after the login there is finished. It must be one of the previously entered redirect uris
 login_url = solid_oidc_client.create_login_uri('/', OAUTH_CALLBACK_URI)
 
 # wait for the user to login with their identity provider
-# listen on /oauth/callback
-# then get code and state from the query params
+# they will be redirected to OAUTH_CALLBACK_URI, so your server needs to listen for GET requests there
+# when the user visits, get the code and state from the query params
 code = flask.request.args['code']
 state = flask.request.args['state']
 
-# and use them to get an authentication session
+# use the code and state to get an authentication session
 # internally this will store an access token and key for dpop
 session = solid_oidc_client.finish_login(
     code=code,
@@ -60,7 +62,7 @@ session = solid_oidc_client.finish_login(
 # use this session to make authenticated requests
 private_url = 'https://pod.example.org/private/secret.txt'
 auth_headers = session.get_auth_headers(private_url, 'GET')
-res = requests.get(url=tested_url, headers=auth_headers)
+res = requests.get(url=private_url, headers=auth_headers)
 print(res.text)
 
 
