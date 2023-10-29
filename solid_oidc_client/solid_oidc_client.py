@@ -20,6 +20,9 @@ class SolidOidcClient:
     """Client to handle Solid-OIDC authentication. Create one per identity provider"""
     def __init__(self, storage: KeyValueStore) -> None:
         self.client = OicClient(client_authn_method=CLIENT_AUTHN_METHOD)
+        # set base_url to have valid urls for the request_uris preregistration
+        # however, as request_uri does not seem to be used later on, we can set it to anything
+        self.client.base_url = "https://example.org/"
         self.storage = storage
         self.provider_info: Optional[ASConfigurationResponse] = None 
         self.client_id: Optional[str] = None
