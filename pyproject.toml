@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "solid_oidc_client"
-version = "0.0.3"
+version = "0.0.4"
 authors = [
   { name="A_A", email="21040751+Otto-AA@users.noreply.github.com" },
 ]
