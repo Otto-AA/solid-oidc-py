@@ -94,7 +94,8 @@ class SolidOidcClient:
 
 
 def create_verifier_challenge():
-    code_verifier = str(uuid4())
+    # code_verifier must be between 43 and 128 chars long
+    code_verifier = str(uuid4()) + str(uuid4())
 
     code_challenge = hashlib.sha256(code_verifier.encode('utf-8')).digest()
     code_challenge = base64.urlsafe_b64encode(code_challenge).decode('utf-8')
